@@ -1,0 +1,189 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.ipinyou.optimus</groupId>
+	<artifactId>entity</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>entity</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.ipinyou.optimus</groupId>
+			<artifactId>base</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>0.11.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.javakaffee</groupId>
+			<artifactId>kryo-serializers</artifactId>
+			<version>0.24</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>kryo</artifactId>
+					<groupId>com.esotericsoftware.kryo</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.esotericsoftware.kryo</groupId>
+			<artifactId>kryo</artifactId>
+			<version>2.22</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>servlet-api</artifactId> 
+			<version>2.5</version> <scope>provided</scope> </dependency> -->
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<charset>UTF-8</charset>
+					<encoding>UTF-8</encoding>
+					<docencoding>UTF-8</docencoding>
+					<links>
+						<link>http://gceclub.sun.com.cn/Java_Docs/html/zh_CN/api</link>
+					</links>
+				</configuration>
+			</plugin>
+			<!-- Bytecode insturmentation in order to enable lazy property loading 
+				by Hibernate. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>Instrument domain classes</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<taskdef name="instrument"
+									classname="org.hibernate.tool.instrument.javassist.InstrumentTask">
+									<classpath>
+										<path refid="maven.runtime.classpath" />
+										<path refid="maven.plugin.classpath" />
+									</classpath>
+								</taskdef>
+								<instrument verbose="true">
+									<fileset dir="${project.build.outputDirectory}">
+										<!-- <include name="com/ipinyou/optimus/console/user/entity/Pool.class" 
+											/> <include name="com/ipinyou/optimus/console/finance/entity/PoolBalance.class" 
+											/> -->
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/Advertiser.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/AdvertiserProperty.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/AdvertiserStats.class" />
+										<!-- <include
+											name="com/ipinyou/optimus/console/ad/entity/AdvertiserConverateIndex.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/AdvertiserOperationInfo.class" /> -->
+										<include
+											name="com/ipinyou/optimus/console/finance/entity/AdvertiserBalance.class" />
+										<include name="com/ipinyou/optimus/console/ad/entity/Order.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/OrderStats.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/Campaign.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/CampaignStats.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/CampaignStatus.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/Strategy.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/StrategyStats.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/StrategyStatus.class" />
+										<include
+											name="com/ipinyou/optimus/console/ad/entity/StrategyBlackWhiteUrl.class" />
+									</fileset>
+								</instrument>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-core</artifactId> 
+						<version>${hibernate.version}</version> </dependency> -->
+					<dependency><!-- bytecode instrumentation library to use... note that 
+							cglib is deprecated -->
+						<groupId>org.javassist</groupId>
+						<artifactId>javassist</artifactId>
+						<version>3.17.1-GA</version>
+					</dependency>
+					<dependency><!-- so that slf4j won't barf about missing binding -->
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-simple</artifactId>
+						<version>1.7.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. see: http://wiki.eclipse.org/M2E_plugin_execution_not_covered -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+    <beans xmlns="http://www.springframework.org/schema/beans"   
+           xmlns:aop="http://www.springframework.org/schema/aop"   
+           xmlns:context="http://www.springframework.org/schema/context"  
+           xmlns:mvc="http://www.springframework.org/schema/mvc"   
+           xmlns:tx="http://www.springframework.org/schema/tx"   
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+           xsi:schemaLocation="http://www.springframework.org/schema/aop   
+            http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+            http://www.springframework.org/schema/beans   
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+            http://www.springframework.org/schema/context   
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd   
+            http://www.springframework.org/schema/mvc   
+            http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd   
+            http://www.springframework.org/schema/tx   
+            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">  
+      
+        <mvc:annotation-driven />  
+        <context:component-scan base-package="com.*" />  
+      <mvc:resources location="/js/" mapping="/js/**" />
+	<mvc:resources location="/css/" mapping="/css/**" />
+
+   
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		<property name="viewResolvers">
+			<list>
+				<!-- Resolves view names to protected .jsp resources within the /WEB-INF/views 
+					directory -->
+				<bean
+					class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					  <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+<!-- 		<property name="defaultViews"> -->
+<!-- 			<bean -->
+<!-- 				class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+      
+<!-- web.xml中shiro的filter对应的bean -->
+<!-- Shiro 的Web过滤器 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<!-- loginUrl认证提交地址，如果没有认证将会请求此地址进行认证，请求此地址将由formAuthenticationFilter进行表单认证 -->
+		<property name="loginUrl" value="/login" />
+		<!-- 认证成功统一跳转到first.action，建议不配置，shiro认证成功自动到上一个请求路径 -->
+<!-- 		<property name="successUrl" value="/first.action"/> -->
+		<!-- 通过unauthorizedUrl指定没有权限操作时跳转页面-->
+		<property name="unauthorizedUrl" value="/refuse.jsp" />
+		<!-- 自定义filter配置 -->
+		
+		<!-- 过虑器链定义，从上向下顺序执行，一般将/**放在最下边 -->
+		<property name="filterChainDefinitions">
+			<value>
+				<!-- 对静态资源设置匿名访问 -->
+				/loginin=authc
+			</value>
+		</property>
+	</bean>
+
+<!-- securityManager安全管理器 -->
+<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="customRealm" />
+</bean>
+
+<!-- realm -->
+<bean id="customRealm" class="com.shiro.cn.cn.CustomRealm">
+</bean>
+
+
+<!-- 设置freeMarker的配置文件路径 -->
+ <bean id="freemarkerConfiguration" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+     <property name="location" value="classpath:freemarker.properties"/>
+ </bean>
+  
+ <!-- 配置freeMarker的模板路径 -->
+ <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+     <!--property name="freemarkerSettings" ref="freemarkerConfiguration"/-->
+     <property name="templateLoaderPath">
+         <value>/WEB-INF/ftl/</value>
+     </property>
+     <property name="freemarkerVariables">
+         <map>
+             <entry key="xml_escape" value-ref="fmXmlEscape" />
+         </map>
+     </property>
+ </bean>
+  
+ <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape"/>
+  
+ <!-- 配置freeMarker视图解析器 -->
+ <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+     <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+     <property name="viewNames" value="*.ftl"/>
+     <property name="contentType" value="text/html; charset=utf-8"/>
+     <property name="cache" value="true" />
+     <property name="prefix" value="" />
+     <property name="suffix" value="" />
+     <property name="order" value="2"/>
+ </bean>
+
+
+    </beans>  
