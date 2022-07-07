@@ -12,7 +12,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>3.2.0.RELEASE</spring.version>
 		<freemarker.version>2.3.19</freemarker.version>
-		<cxf.version>2.7.1</cxf.version>
+		<cxf.version>2.7.9</cxf.version>
 		<hibernate.version>4.1.9.Final</hibernate.version>
 		<drools.version>5.5.0.Final</drools.version>
 	</properties>
